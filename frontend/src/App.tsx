@@ -1,121 +1,81 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useCallback, useEffect, useState } from 'react'
 import './App.css'
+import { CatalogoItens } from './components/CatalogoItens'
+import { ChecklistDiario } from './components/ChecklistDiario'
+import { HeaderProgresso } from './components/HeaderProgresso'
+import { TabNav } from './components/TabNav'
+import type { AbaAtiva } from './components/TabNav'
+import { getProgresso } from './services/itemService'
+import type { ProgressoMensal } from './types'
+
+function formatarDataLocal(data: Date) {
+  const ano = data.getFullYear()
+  const mes = String(data.getMonth() + 1).padStart(2, '0')
+  const dia = String(data.getDate()).padStart(2, '0')
+
+  return `${ano}-${mes}-${dia}`
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const dataAtual = formatarDataLocal(new Date())
+  const [anoMes, setAnoMes] = useState(dataAtual.slice(0, 7))
+  const [dataChecklist, setDataChecklist] = useState(dataAtual)
+  const [abaAtiva, setAbaAtiva] = useState<AbaAtiva>('DICA')
+  const [progresso, setProgresso] = useState<ProgressoMensal | null>(null)
+  const [carregandoProgresso, setCarregandoProgresso] = useState(true)
+  const [erroProgresso, setErroProgresso] = useState<string | null>(null)
+
+  const carregarProgresso = useCallback(async () => {
+    setCarregandoProgresso(true)
+    setErroProgresso(null)
+
+    try {
+      const dados = await getProgresso(anoMes)
+      setProgresso(dados)
+    } catch {
+      setProgresso(null)
+      setErroProgresso('Não foi possível carregar o progresso desta competência.')
+    } finally {
+      setCarregandoProgresso(false)
+    }
+  }, [anoMes])
+
+  useEffect(() => {
+    void carregarProgresso()
+  }, [carregarProgresso])
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(8,145,178,0.12),_transparent_35%)]">
+      <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <HeaderProgresso
+          anoMes={anoMes}
+          progresso={progresso}
+          carregando={carregandoProgresso}
+          onAnoMesChange={setAnoMes}
+        />
+
+        {erroProgresso && (
+          <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+            {erroProgresso}
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+        )}
 
-      <div className="ticks"></div>
+        <TabNav abaAtiva={abaAtiva} onAbaChange={setAbaAtiva} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        <div className="rounded-3xl border border-slate-800 bg-slate-950/50 p-4 sm:p-6">
+          {abaAtiva === 'CHECKLIST' ? (
+            <ChecklistDiario data={dataChecklist} onDataChange={setDataChecklist} />
+          ) : (
+            <CatalogoItens
+              anoMes={anoMes}
+              tipoAtivo={abaAtiva}
+              onTipoChange={setAbaAtiva}
+              onCurtidaAlternada={carregarProgresso}
+            />
+          )}
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      </main>
+    </div>
   )
 }
 
