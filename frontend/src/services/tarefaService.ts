@@ -20,10 +20,15 @@ export async function toggleTarefa(
   id: number,
   dataRegistro: string,
 ): Promise<void> {
-  const params = new URLSearchParams({ dataRegistro })
   const response = await fetch(
-    `/api/tarefas-diarias/${id}/toggle-conclusao?${params.toString()}`,
-    { method: 'POST' },
+    `/api/tarefas-diarias/${id}/toggle-conclusao`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ dataRegistro }),
+    },
   )
   await validarResposta(response)
 }

@@ -24,10 +24,15 @@ export async function getItens(tipo: TipoItem, anoMes: string): Promise<Item[]> 
 }
 
 export async function toggleCurtida(id: number, anoMes: string): Promise<void> {
-  const params = new URLSearchParams({ anoMes })
   const response = await fetch(
-    `/api/itens/${id}/toggle-curtida?${params.toString()}`,
-    { method: 'POST' },
+    `/api/itens/${id}/toggle-curtida`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ anoMes }),
+    },
   )
   await validarResposta(response)
 }
