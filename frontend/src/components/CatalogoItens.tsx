@@ -58,7 +58,7 @@ export function CatalogoItens({
     return itens.filter((item) => {
       const correspondeBusca =
         !termo ||
-        normalizarTexto(`${item.titulo} ${item.conteudo}`).includes(termo)
+        normalizarTexto(item.nome).includes(termo)
       const correspondeCurtida = !apenasNaoCurtidos || !item.curtido
 
       return correspondeBusca && correspondeCurtida

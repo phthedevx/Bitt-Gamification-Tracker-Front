@@ -17,7 +17,7 @@ export function ItemCard({ item, onToggleCurtida }: ItemCardProps) {
   }, [])
 
   async function copiarConteudo() {
-    await navigator.clipboard.writeText(`${item.titulo}\n\n${item.conteudo}`)
+    await navigator.clipboard.writeText(item.nome)
     setCopiado(true)
     window.clearTimeout(temporizador.current)
     temporizador.current = window.setTimeout(() => setCopiado(false), 1800)
@@ -34,8 +34,7 @@ export function ItemCard({ item, onToggleCurtida }: ItemCardProps) {
 
   return (
     <article className="group flex h-full flex-col rounded-2xl border border-slate-800 bg-slate-900 p-5 transition hover:-translate-y-0.5 hover:border-slate-700 hover:shadow-xl hover:shadow-slate-950/40">
-      <div className="mb-3 flex items-start justify-between gap-3">
-        <h3 className="text-lg font-bold leading-snug text-white">{item.titulo}</h3>
+      <div className="mb-3 flex items-start justify-end gap-3">
         <button
           type="button"
           onClick={alternarCurtida}
@@ -56,7 +55,7 @@ export function ItemCard({ item, onToggleCurtida }: ItemCardProps) {
       </div>
 
       <p className="mb-5 flex-1 whitespace-pre-line text-sm leading-6 text-slate-400">
-        {item.conteudo}
+        {item.nome}
       </p>
 
       <button

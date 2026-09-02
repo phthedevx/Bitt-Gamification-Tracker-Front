@@ -10,8 +10,7 @@ export type CategoriaTarefa =
 
 export interface Item {
   id: number
-  titulo: string
-  conteudo: string
+  nome: string
   tipo: TipoItem
   curtido: boolean
 }
