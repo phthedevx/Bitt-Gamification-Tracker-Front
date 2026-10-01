@@ -10,16 +10,17 @@ export type CategoriaTarefa =
 
 export interface Item {
   id: number
-  titulo: string
-  conteudo: string
+  nome: string
   tipo: TipoItem
   curtido: boolean
 }
 
-export interface ProgressoMensal {
-  anoMes: string
+export interface ProgressoDiario {
+  data: string
   dicasCurtidas: number
   receitasCurtidas: number
+  metaDicas: number
+  metaReceitas: number
 }
 
 export interface TarefaDiaria {
