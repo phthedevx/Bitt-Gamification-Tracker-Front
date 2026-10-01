@@ -78,4 +78,65 @@ describe('CatalogoItens', () => {
     const btnCurtir = screen.getByRole('button', { name: /Não é possível curtir/i })
     expect(btnCurtir).toBeDisabled()
   })
+
+  it('cobre nova curtida ao mudar competência', async () => {
+    // Cenário: em Outubro o item vem curtido. Em Novembro vem não curtido e é curtido novamente.
+    vi.spyOn(itemService, 'getItens').mockImplementation(async (_tipo, anoMes) => {
+      if (anoMes === '2026-10') {
+        return [{ id: 10, nome: 'Cafeína', tipo: 'DICA', curtido: true }]
+      }
+      if (anoMes === '2026-11') {
+        return [{ id: 10, nome: 'Cafeína', tipo: 'DICA', curtido: false }]
+      }
+      return []
+    })
+
+    const curtirMock = vi.spyOn(itemService, 'curtir').mockResolvedValue(undefined)
+    const onCurtida = vi.fn()
+    
+    // Renderiza em outubro (hoje 2026-11-03, mas vemos outubro histórico)
+    const { rerender } = render(
+      <CatalogoItens 
+        dataAtual="2026-11-03" 
+        anoMes="2026-10" 
+        tipoAtivo="DICA" 
+        onTipoChange={vi.fn()} 
+        onCurtida={onCurtida} 
+      />
+    )
+
+    await waitFor(() => {
+      // Já está curtido em outubro, então o botão está marcado
+      expect(screen.getByRole('button', { name: /já curtido/i })).toBeDisabled()
+    })
+
+    // Troca para novembro
+    rerender(
+      <CatalogoItens 
+        dataAtual="2026-11-03" 
+        anoMes="2026-11" 
+        tipoAtivo="DICA" 
+        onTipoChange={vi.fn()} 
+        onCurtida={onCurtida} 
+      />
+    )
+
+    await waitFor(() => {
+      // Agora o botão pode ser clicado, pois curtido=false vindo da API
+      const btnCurtir = screen.getByRole('button', { name: /Curtir Cafeína/i })
+      expect(btnCurtir).not.toBeDisabled()
+      
+      // Realiza a curtida
+      fireEvent.click(btnCurtir)
+    })
+
+    await waitFor(() => {
+      // Garante que enviou POST válido para novembro
+      expect(curtirMock).toHaveBeenCalledWith(10, '2026-11', '2026-11-03')
+      expect(onCurtida).toHaveBeenCalled()
+      
+      // O botão passa a ficar desabilitado como já curtido
+      expect(screen.getByRole('button', { name: /já curtido/i })).toBeDisabled()
+    })
+  })
 })
