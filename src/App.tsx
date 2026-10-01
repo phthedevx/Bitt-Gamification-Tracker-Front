@@ -6,22 +6,15 @@ import { HeaderProgresso } from './components/HeaderProgresso'
 import { TabNav } from './components/TabNav'
 import type { AbaAtiva } from './components/TabNav'
 import { getProgresso } from './services/itemService'
-import type { ProgressoMensal } from './types'
-
-function formatarDataLocal(data: Date) {
-  const ano = data.getFullYear()
-  const mes = String(data.getMonth() + 1).padStart(2, '0')
-  const dia = String(data.getDate()).padStart(2, '0')
-
-  return `${ano}-${mes}-${dia}`
-}
+import type { ProgressoDiario } from './types'
+import { getLocalDateString, getLocalYearMonthString } from './utils/date'
 
 function App() {
-  const dataAtual = formatarDataLocal(new Date())
-  const [anoMes, setAnoMes] = useState(dataAtual.slice(0, 7))
+  const dataAtual = getLocalDateString()
+  const [anoMes, setAnoMes] = useState(getLocalYearMonthString())
   const [dataChecklist, setDataChecklist] = useState(dataAtual)
   const [abaAtiva, setAbaAtiva] = useState<AbaAtiva>('DICA')
-  const [progresso, setProgresso] = useState<ProgressoMensal | null>(null)
+  const [progresso, setProgresso] = useState<ProgressoDiario | null>(null)
   const [carregandoProgresso, setCarregandoProgresso] = useState(true)
   const [erroProgresso, setErroProgresso] = useState<string | null>(null)
 
@@ -30,15 +23,15 @@ function App() {
     setErroProgresso(null)
 
     try {
-      const dados = await getProgresso(anoMes)
+      const dados = await getProgresso(dataAtual)
       setProgresso(dados)
     } catch {
       setProgresso(null)
-      setErroProgresso('Não foi possível carregar o progresso desta competência.')
+      setErroProgresso('Não foi possível carregar o progresso do dia atual.')
     } finally {
       setCarregandoProgresso(false)
     }
-  }, [anoMes])
+  }, [dataAtual])
 
   useEffect(() => {
     void carregarProgresso()
@@ -67,10 +60,11 @@ function App() {
             <ChecklistDiario data={dataChecklist} onDataChange={setDataChecklist} />
           ) : (
             <CatalogoItens
+              dataAtual={dataAtual}
               anoMes={anoMes}
               tipoAtivo={abaAtiva}
               onTipoChange={setAbaAtiva}
-              onCurtidaAlternada={carregarProgresso}
+              onCurtida={carregarProgresso}
             />
           )}
         </div>
