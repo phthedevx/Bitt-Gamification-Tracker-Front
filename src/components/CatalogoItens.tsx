@@ -1,14 +1,15 @@
 import { HeartOff, Lightbulb, LoaderCircle, Search, Utensils } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { getItens, toggleCurtida } from '../services/itemService'
+import { curtir, getItens } from '../services/itemService'
 import type { Item, TipoItem } from '../types'
 import { ItemCard } from './ItemCard'
 
 interface CatalogoItensProps {
+  dataAtual: string
   anoMes: string
   tipoAtivo: TipoItem
   onTipoChange: (tipo: TipoItem) => void
-  onCurtidaAlternada: () => void | Promise<void>
+  onCurtida: () => void | Promise<void>
 }
 
 function normalizarTexto(texto: string) {
@@ -19,10 +20,11 @@ function normalizarTexto(texto: string) {
 }
 
 export function CatalogoItens({
+  dataAtual,
   anoMes,
   tipoAtivo,
   onTipoChange,
-  onCurtidaAlternada,
+  onCurtida,
 }: CatalogoItensProps) {
   const [itens, setItens] = useState<Item[]>([])
   const [busca, setBusca] = useState('')
@@ -58,24 +60,28 @@ export function CatalogoItens({
     return itens.filter((item) => {
       const correspondeBusca =
         !termo ||
-        normalizarTexto(`${item.titulo} ${item.conteudo}`).includes(termo)
+        normalizarTexto(item.nome).includes(termo)
       const correspondeCurtida = !apenasNaoCurtidos || !item.curtido
 
       return correspondeBusca && correspondeCurtida
     })
   }, [apenasNaoCurtidos, busca, itens])
 
-  async function alternarCurtida(item: Item) {
+  const mesAtual = dataAtual.slice(0, 7)
+  const podeCurtir = anoMes === mesAtual
+
+  async function curtirItem(item: Item) {
+    if (item.curtido || !podeCurtir) return
     setErro(null)
 
     try {
-      await toggleCurtida(item.id, anoMes)
+      await curtir(item.id, anoMes, dataAtual)
       setItens((atuais) =>
         atuais.map((atual) =>
-          atual.id === item.id ? { ...atual, curtido: !atual.curtido } : atual,
+          atual.id === item.id ? { ...atual, curtido: true } : atual,
         ),
       )
-      await onCurtidaAlternada()
+      await onCurtida()
     } catch {
       setErro('Não foi possível atualizar a curtida. Tente novamente.')
     }
@@ -160,7 +166,12 @@ export function CatalogoItens({
       ) : itensFiltrados.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {itensFiltrados.map((item) => (
-            <ItemCard key={item.id} item={item} onToggleCurtida={alternarCurtida} />
+            <ItemCard
+              key={item.id}
+              item={item}
+              podeCurtir={podeCurtir}
+              onCurtir={curtirItem}
+            />
           ))}
         </div>
       ) : (
