@@ -2,11 +2,10 @@ export type TipoItem = 'DICA' | 'RECEITA'
 
 export type CategoriaTarefa =
   | 'TREINO'
+  | 'CORRIDA'
+  | 'POSTAGEM'
   | 'AGUA'
-  | 'ALIMENTACAO'
-  | 'LEITURA'
-  | 'SONO'
-  | 'OUTRA'
+  | 'OUTRO'
 
 export interface Item {
   id: number
@@ -25,8 +24,9 @@ export interface ProgressoDiario {
 
 export interface TarefaDiaria {
   id: number
-  titulo: string
+  nome: string
+  pontos: number
   categoria: CategoriaTarefa
-  concluida: boolean
+  concluido: boolean
   dataRegistro?: string
 }

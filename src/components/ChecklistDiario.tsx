@@ -10,20 +10,18 @@ interface ChecklistDiarioProps {
 
 const estilosCategoria: Record<CategoriaTarefa, string> = {
   TREINO: 'border-orange-500/30 bg-orange-500/10 text-orange-300',
+  CORRIDA: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
+  POSTAGEM: 'border-violet-500/30 bg-violet-500/10 text-violet-300',
   AGUA: 'border-sky-500/30 bg-sky-500/10 text-sky-300',
-  ALIMENTACAO: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300',
-  LEITURA: 'border-violet-500/30 bg-violet-500/10 text-violet-300',
-  SONO: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-300',
-  OUTRA: 'border-slate-600 bg-slate-800 text-slate-300',
+  OUTRO: 'border-slate-600 bg-slate-800 text-slate-300',
 }
 
 const rotulosCategoria: Record<CategoriaTarefa, string> = {
   TREINO: 'Treino',
+  CORRIDA: 'Corrida',
+  POSTAGEM: 'Postagem',
   AGUA: 'Água',
-  ALIMENTACAO: 'Alimentação',
-  LEITURA: 'Leitura',
-  SONO: 'Sono',
-  OUTRA: 'Outra',
+  OUTRO: 'Outro',
 }
 
 export function ChecklistDiario({ data, onDataChange }: ChecklistDiarioProps) {
@@ -63,7 +61,7 @@ export function ChecklistDiario({ data, onDataChange }: ChecklistDiarioProps) {
       setTarefas((atuais) =>
         atuais.map((atual) =>
           atual.id === tarefa.id
-            ? { ...atual, concluida: !atual.concluida, dataRegistro: data }
+            ? { ...atual, concluido: !atual.concluido, dataRegistro: data }
             : atual,
         ),
       )
@@ -74,7 +72,7 @@ export function ChecklistDiario({ data, onDataChange }: ChecklistDiarioProps) {
     }
   }
 
-  const concluidas = tarefas.filter((tarefa) => tarefa.concluida).length
+  const concluidas = tarefas.filter((tarefa) => tarefa.concluido).length
 
   return (
     <section aria-labelledby="titulo-checklist">
@@ -125,7 +123,7 @@ export function ChecklistDiario({ data, onDataChange }: ChecklistDiarioProps) {
             const salvando = salvandoId === tarefa.id
             const categoria = estilosCategoria[tarefa.categoria]
               ? tarefa.categoria
-              : 'OUTRA'
+              : 'OUTRO'
 
             return (
               <li key={tarefa.id}>
@@ -134,18 +132,18 @@ export function ChecklistDiario({ data, onDataChange }: ChecklistDiarioProps) {
                   onClick={() => alternarConclusao(tarefa)}
                   disabled={salvando}
                   className={`flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition disabled:cursor-wait disabled:opacity-60 ${
-                    tarefa.concluida
+                    tarefa.concluido
                       ? 'border-emerald-500/20 bg-emerald-500/5'
                       : 'border-slate-800 bg-slate-900 hover:border-slate-700'
                   }`}
-                  aria-pressed={tarefa.concluida}
+                  aria-pressed={tarefa.concluido}
                 >
                   {salvando ? (
                     <LoaderCircle
                       className="h-6 w-6 shrink-0 animate-spin text-cyan-400"
                       aria-hidden="true"
                     />
-                  ) : tarefa.concluida ? (
+                  ) : tarefa.concluido ? (
                     <CheckCircle2
                       className="h-6 w-6 shrink-0 text-emerald-400"
                       aria-hidden="true"
@@ -156,10 +154,14 @@ export function ChecklistDiario({ data, onDataChange }: ChecklistDiarioProps) {
 
                   <span
                     className={`min-w-0 flex-1 font-semibold ${
-                      tarefa.concluida ? 'text-slate-500 line-through' : 'text-slate-100'
+                      tarefa.concluido ? 'text-slate-500 line-through' : 'text-slate-100'
                     }`}
                   >
-                    {tarefa.titulo}
+                    {tarefa.nome}
+                  </span>
+
+                  <span className="text-sm font-bold text-slate-400">
+                    {tarefa.pontos} pts
                   </span>
 
                   <span
