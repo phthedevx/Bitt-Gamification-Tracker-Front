@@ -1,12 +1,10 @@
 import { Lightbulb, Trophy, Utensils } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import type { ProgressoMensal } from '../types'
-
-const META_MENSAL = 25
+import type { ProgressoDiario } from '../types'
 
 interface HeaderProgressoProps {
   anoMes: string
-  progresso: ProgressoMensal | null
+  progresso: ProgressoDiario | null
   carregando?: boolean
   onAnoMesChange: (anoMes: string) => void
 }
@@ -14,12 +12,13 @@ interface HeaderProgressoProps {
 interface BarraProgressoProps {
   titulo: string
   atual: number
+  meta: number
   cor: string
   Icone: LucideIcon
 }
 
-function BarraProgresso({ titulo, atual, cor, Icone }: BarraProgressoProps) {
-  const percentual = Math.min(100, Math.max(0, (atual / META_MENSAL) * 100))
+function BarraProgresso({ titulo, atual, meta, cor, Icone }: BarraProgressoProps) {
+  const percentual = meta > 0 ? Math.min(100, Math.max(0, (atual / meta) * 100)) : 0
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
@@ -29,7 +28,7 @@ function BarraProgresso({ titulo, atual, cor, Icone }: BarraProgressoProps) {
           <span>{titulo}</span>
         </div>
         <span className="text-sm font-bold text-white">
-          {atual}/{META_MENSAL}
+          {atual}/{meta}
         </span>
       </div>
       <div
@@ -37,7 +36,7 @@ function BarraProgresso({ titulo, atual, cor, Icone }: BarraProgressoProps) {
         role="progressbar"
         aria-label={`Progresso de ${titulo}`}
         aria-valuemin={0}
-        aria-valuemax={META_MENSAL}
+        aria-valuemax={meta}
         aria-valuenow={atual}
       >
         <div
@@ -62,7 +61,7 @@ export function HeaderProgresso({
           <div className="mb-2 flex items-center gap-2 text-cyan-400">
             <Trophy className="h-5 w-5" aria-hidden="true" />
             <span className="text-xs font-bold uppercase tracking-[0.2em]">
-              Evolução mensal
+              Progresso Diário
             </span>
           </div>
           <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
@@ -85,12 +84,14 @@ export function HeaderProgresso({
         <BarraProgresso
           titulo="Dicas"
           atual={progresso?.dicasCurtidas ?? 0}
+          meta={progresso?.metaDicas ?? 25}
           cor="bg-gradient-to-r from-cyan-500 to-blue-500"
           Icone={Lightbulb}
         />
         <BarraProgresso
           titulo="Receitas"
           atual={progresso?.receitasCurtidas ?? 0}
+          meta={progresso?.metaReceitas ?? 25}
           cor="bg-gradient-to-r from-fuchsia-500 to-violet-500"
           Icone={Utensils}
         />
