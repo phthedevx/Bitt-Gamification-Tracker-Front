@@ -47,7 +47,7 @@ O `CatalogoItens` avalia se `anoMes === mesAtual` e gera uma booleana `podeCurti
 
 ## 10. Filtros e busca
 
-O filtro "Apenas não curtidos" continuou operacional. Uma vez que o fluxo foi unificado e não ocorre mais a inversão de estados indevidas, após a curtida otimista, o array sofre mutation pontual de `curtido: true` e a memoização do React expulsa o item visualmente com fluidez, tudo alinhado a pesquisa nativa.
+O filtro "Apenas não curtidos" continuou operacional. Uma vez que o fluxo foi unificado e não ocorre mais a inversão de estados indevidas, após a curtida confirmada, o array sofre mutation pontual de `curtido: true` e a memoização do React expulsa o item visualmente com fluidez, tudo alinhado a pesquisa nativa.
 
 ## 11. Tratamento de loading
 
