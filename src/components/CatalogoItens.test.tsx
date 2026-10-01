@@ -1,3 +1,5 @@
+import "@testing-library/jest-dom/vitest";
+/// <reference types="@testing-library/jest-dom" />
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { CatalogoItens } from './CatalogoItens'
