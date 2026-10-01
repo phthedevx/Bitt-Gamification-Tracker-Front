@@ -1,4 +1,4 @@
-import type { Item, ProgressoMensal, TipoItem } from '../types'
+import type { Item, ProgressoDiario, TipoItem } from '../types'
 
 async function validarResposta(response: Response): Promise<Response> {
   if (!response.ok) {
@@ -8,11 +8,12 @@ async function validarResposta(response: Response): Promise<Response> {
   return response
 }
 
-export async function getProgresso(anoMes: string): Promise<ProgressoMensal> {
-  const response = await fetch(`/api/progresso/${encodeURIComponent(anoMes)}`)
+export async function getProgresso(data: string): Promise<ProgressoDiario> {
+  const params = new URLSearchParams({ data })
+  const response = await fetch(`/api/progresso?${params.toString()}`)
   await validarResposta(response)
 
-  return response.json() as Promise<ProgressoMensal>
+  return response.json() as Promise<ProgressoDiario>
 }
 
 export async function getItens(tipo: TipoItem, anoMes: string): Promise<Item[]> {
@@ -23,11 +24,16 @@ export async function getItens(tipo: TipoItem, anoMes: string): Promise<Item[]> 
   return response.json() as Promise<Item[]>
 }
 
-export async function toggleCurtida(id: number, anoMes: string): Promise<void> {
-  const params = new URLSearchParams({ anoMes })
+export async function curtir(id: number, anoMes: string, data: string): Promise<void> {
   const response = await fetch(
-    `/api/itens/${id}/toggle-curtida?${params.toString()}`,
-    { method: 'POST' },
+    `/api/itens/${id}/curtida`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ anoMes, data }),
+    },
   )
   await validarResposta(response)
 }
